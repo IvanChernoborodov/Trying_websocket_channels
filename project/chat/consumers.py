@@ -1,9 +1,22 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 
+def it():
+    i = 0
+    while True:
+        yield i
+        i += 1
+
+x = it()
+async def prod():
+    async for i in x:
+        return i
+
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
+        print(self.room_name)
         self.room_group_name = 'chat_%s' % self.room_name
         print('connected')
         # Join room group
@@ -11,7 +24,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -42,5 +54,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print(message)
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': prod()
         }))
