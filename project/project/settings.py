@@ -43,12 +43,14 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION = 'project.routing.application'
 
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'asgiref.inmemory.ChannelLayer',
-#         'ROUTING': 'project.routing.channel_routing',
-#     },
-# }
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
