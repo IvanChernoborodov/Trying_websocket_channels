@@ -1,13 +1,44 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
+import time
+import asyncio
+
+
+async def gener():
+    i = 0
+    while True:
+        yield str(i)
+        i += 1
+
+x = gener()
+
+async def producer():
+    async for i in x:
+        await asyncio.sleep(2)
+        return str(i)
+
+
 
 class EchoConsumer(AsyncWebsocketConsumer):
-    # groups = ["broadcast"]
 
     async def connect(self):
+        async def gener():
+            i = 0
+            while True:
+                yield str(i)
+                i += 1
+
+        x = gener()
+
+        async def producer():
+            async for i in x:
+                await asyncio.sleep(2)
+                return str(i)
         # Called on connection.
         # To accept the connection call:
         await self.accept()
+        while True:
+            await self.send(text_data= await producer())
 
         # Or accept the connection and specify a chosen subprotocol.
         # A list of subprotocols specified by the connecting client
@@ -19,7 +50,8 @@ class EchoConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         # Called with either text_data or bytes_data for each frame
         # You can call:
-        await self.send(text_data="Hello world!")
+        # await self.send(text_data="Hello world!")
+        await self.send(text_data=await producer())
 
         # Or, to send a binary frame:
         # await self.send(bytes_data="Hello world!")
